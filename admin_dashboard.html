@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Admin</title>
+    <link id="style" rel="stylesheet" href="admin_dashboard.css">
+</head>
+<body>
+    <!-- Navbar -->
+   <!-- Navbar -->
+<div class="navbar">
+    <h1>Halaman Admin</h1>
+    <div class="navbar-right">
+        <a href="./admin_dashboard.html">Beranda</a>
+        <a href="#" id="itaLink">Ita</a>
+        <ul id="daftarIta">
+            <a href="admin.html">USER</a>
+            <a href="USER.html">ADMIN</a>
+        </ul>        
+        <a href="tentang.html">Tentang Kami</a>
+        <a href="kontak.html">Kontak</a>
+        <button id="logoutButton">Keluar</button>
+    </div>
+</div>
+
+
+    <h1>Ini Admin</h1>
+    <div class="navbar-right">
+        <!-- Elemen untuk menampilkan jumlah pengguna aktif -->
+        <p id="activeUsers">Pengguna user: 0</p>
+        <p id="activeAdmins">Admin Aktif: 0</p>
+        
+
+        <p id="ss">Pengguna Aktif antara admin dan user : 0</p>
+
+    </div>
+    <canvas id="userAdminChart"></canvas>
+
+   <!-- Tabel untuk data pengguna -->
+
+
+
+    <!-- Konten lainnya -->
+
+    <script type="module" src="admin_dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+</html>

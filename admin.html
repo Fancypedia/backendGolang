@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Admin</title>
+    <link id="style" rel="stylesheet" href="admin_dashboard.css">
+</head>
+<body>
+    <!-- Navbar -->
+   <!-- Navbar -->
+<div class="navbar">
+    <h1>Halaman Admin</h1>
+    <div class="navbar-right">
+        <a href="admin_dashboard.html">Beranda</a>
+        <a href="#" id="itaLink">Ita</a>
+        <ul id="daftarIta">
+            <a href="admin.html">USER</a>
+            <a href="USER.html">ADMIN</a>
+        </ul>        
+        <a href="tentang.html">Tentang Kami</a>
+        <a href="kontak.html">Kontak</a>
+        <button id="logoutButton">Keluar</button>
+    </div>
+</div>
+
+
+    <h1>Ini user</h1>
+    <div class="navbar-right">
+        <!-- Elemen untuk menampilkan jumlah pengguna aktif -->
+        <p id="activeUsers">Pengguna user: 0</p>
+        <p id="activeAdmins">Admin Aktif: 0</p>
+        
+
+        <p id="ss">Pengguna Aktif antara admin dan user : 0</p>
+
+    </div>
+   <!-- Tabel untuk data pengguna -->
+   <!-- Elemen input untuk filter -->
+<input type="text" id="filterFirstName" placeholder="Cari Nama Depan" >
+
+<table id="userTable">
+    <thead>
+        <tr>
+            <th>Nama Depan</th>
+            <th>Nama Belakang</th>
+            <th>Email</th>
+            <th>Nomor Telepon</th>
+            <th>User Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Baris data pengguna akan ditambahkan di sini -->
+    </tbody>
+</table>
+
+>
+
+    <!-- Konten lainnya -->
+
+    <script type="module" src="admin_dashboard.js"></script>
+</body>
+</html>

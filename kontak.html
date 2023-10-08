@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontak Fancy Pedia</title>
+    <link rel="stylesheet" href="kontak.css">
+</head>
+<body>
+    <h1>INI KONTAK</h1>
+
+    <!-- Tambahkan elemen untuk menampilkan informasi JSON -->
+    <div id="kontak-info">
+        <h2>Informasi Kontak Fancy Pedia</h2>
+        <p>Nama: <span id="nama"></span></p>
+        <p>Lokasi: <span id="lokasi"></span></p>
+        <p>Nomor HP: <span id="nomor-hp"></span></p>
+        <p>Latar Belakang: <span id="latar-belakang"></span></p>
+        <p>About: <span id="about"></span></p>
+    </div>
+    <div id="map" style="height: 500px;"></div>
+
+    <!-- Add a table to display GeoJSON data -->
+    <table border="1">
+        <tbody id="geojson-table">
+            <!-- Rows for GeoJSON data will be added here -->
+        </tbody>
+    </table>
+    <!-- Include OpenLayers via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/openlayers@4.6.5/dist/ol.js"></script>
+
+    <!-- Your JavaScript code here -->
+    <!-- Muat file JavaScript terpisah -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>

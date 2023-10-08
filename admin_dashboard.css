@@ -1,0 +1,93 @@
+/* Aturan gaya untuk navbar */
+.navbar {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar button {
+    background-color: #fff;
+    color: #007bff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 10px; /* Jarak antara tombol dan elemen sebelahnya */
+}
+/* Merapikan tautan "Ita" */
+a {
+    text-decoration: none; /* Menghapus garis bawah default pada tautan */
+    font-weight: bold; /* Membuat teks tautan tebal */
+    color: #333; /* Mengubah warna teks tautan */
+    display: inline-block; /* Membuat tautan menjadi elemen inline-block */
+    margin-bottom: 10px; /* Memberikan ruang antara tautan dan daftar */
+}
+
+/* Merapikan daftar dalam ul */
+ul {
+    list-style-type: none; /* Menghilangkan tanda bullet pada daftar */
+    padding-left: 0; /* Menghapus padding kiri pada daftar */
+}
+
+/* Merapikan elemen daftar (li) */
+li {
+    margin-bottom: 5px; /* Memberikan ruang antara elemen daftar */
+}
+
+/* Merapikan tautan dalam elemen daftar (a) */
+li a {
+    text-decoration: none; /* Menghapus garis bawah default pada tautan */
+    color: #555; /* Mengubah warna teks tautan dalam daftar */
+}
+/* Merapikan tautan "Ita" */
+#itaLink {
+    text-decoration: none;
+    font-weight: bold;
+    color: #3498db;
+    transition: color 0.3s; /* Efek transisi warna tautan */
+    cursor: pointer;
+}
+
+#itaLink:hover {
+    color: #e74c3c; /* Warna saat tautan dihover */
+}
+
+/* Merapikan daftar dalam ul */
+#daftarIta {
+    list-style-type: none;
+    padding-left: 0;
+    display: none; /* Awalnya disembunyikan */
+}
+
+/* Merapikan elemen daftar (li) */
+#daftarIta li {
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+/* Merapikan tautan dalam elemen daftar (a) */
+#daftarIta li a {
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s;
+}
+
+#daftarIta li a:hover {
+    color: #e74c3c; /* Warna saat tautan dihover */
+}
+#userAdminChart {
+    width: 100px; /* Ganti ukuran sesuai kebutuhan Anda */
+    height: 100px; /* Ganti ukuran sesuai kebutuhan Anda */
+}
