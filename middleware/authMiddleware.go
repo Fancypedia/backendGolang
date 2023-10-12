@@ -10,7 +10,7 @@ import (
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Hanya memeriksa token jika metode permintaan adalah GET
-		if c.Request.Method == "POST" {
+		if c.Request.Method == "" {
 			clientToken := c.Request.Header.Get("Authorization")
 			if clientToken == "" {
 				c.JSON(http.StatusUnauthorized, gin.H{"message": "Token not found"})
