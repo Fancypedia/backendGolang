@@ -106,7 +106,7 @@ func EditProduct() gin.HandlerFunc {
 		}
 
 		//get updated user details
-		var updatedAbsensi models.User
+		var updatedAbsensi models.ProductAll
 		if result.MatchedCount == 1 {
 			err := productAllCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&updatedAbsensi)
 			if err != nil {
@@ -136,13 +136,13 @@ func DeleteProduct() gin.HandlerFunc {
 
 		if result.DeletedCount < 1 {
 			c.JSON(http.StatusNotFound,
-				responses.GetAProduct{Status: http.StatusNotFound, Message: "error", Data: map[string]interface{}{"data": "Absensi with specified ID not found!"}},
+				responses.GetAProduct{Status: http.StatusNotFound, Message: "error", Data: map[string]interface{}{"data": "Product with specified ID not found!"}},
 			)
 			return
 		}
 
 		c.JSON(http.StatusOK,
-			responses.GetAProduct{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "Absensi successfully deleted!"}},
+			responses.GetAProduct{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "Product successfully deleted!"}},
 		)
 	}
 }
