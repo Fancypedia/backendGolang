@@ -22,42 +22,38 @@ var validate_product = validator.New()
 func CreateProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var user models.User
+		var product models.ProductAll
 		defer cancel()
 
 		//validate the request body
-		if err := c.BindJSON(&user); err != nil {
-			c.JSON(http.StatusBadRequest, responses.GetallUser{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		if err := c.BindJSON(&product); err != nil {
+			c.JSON(http.StatusBadRequest, responses.GetAProduct{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
 		//use the validator library to validate required fields
-		if validationErr := validate_product.Struct(&user); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.GetallUser{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+		if validationErr := validate_product.Struct(&product); validationErr != nil {
+			c.JSON(http.StatusBadRequest, responses.GetAProduct{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
 			return
 		}
 
-		newUser := models.User{
-			ID:           primitive.NewObjectID(),
-			First_name:   user.First_name,
-			Last_name:    user.Last_name,
-			Password:     user.Password,
-			Email:        user.Email,
-			Phone:        user.Phone,
-			Token:        user.Token,
-			User_type:    user.User_type,
-			Created_at:   time.Now(),
-			Updated_at:   time.Now(),
-			Paseto_token: user.Paseto_token,
+		newUser := models.ProductAll{
+			ID:          primitive.NewObjectID(),
+			Name:        product.Name,
+			Description: product.Description,
+			Price:       product.Price,
+			Stock:       product.Stock,
+			Size:        product.Size,
+			Image:       product.Image,
 		}
 
 		result, err := productAllCollection.InsertOne(ctx, newUser)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.GetAProduct{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
-		c.JSON(http.StatusCreated, responses.GetallUser{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
+		c.JSON(http.StatusCreated, responses.GetAProduct{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
 	}
 }
 
@@ -65,18 +61,18 @@ func GetProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		userId := c.Param("productGetId")
-		var user models.User
+		var user models.ProductAll
 		defer cancel()
 
 		objId, _ := primitive.ObjectIDFromHex(userId)
 
 		err := productAllCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&user)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.GetAProduct{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
-		c.JSON(http.StatusOK, responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": user}})
+		c.JSON(http.StatusOK, responses.GetAProduct{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": user}})
 	}
 }
 
@@ -84,28 +80,28 @@ func EditProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		absensiId := c.Param("productID")
-		var absensi models.User
+		var product models.ProductAll
 		defer cancel()
 
 		objId, _ := primitive.ObjectIDFromHex(absensiId)
 
 		//validate the request body
-		if err := c.BindJSON(&absensi); err != nil {
-			c.JSON(http.StatusBadRequest, responses.GetallUser{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		if err := c.BindJSON(&product); err != nil {
+			c.JSON(http.StatusBadRequest, responses.GetAProduct{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
 		//use the validator library to validate required fields
-		if validationErr := validate_product.Struct(&absensi); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.GetallUser{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+		if validationErr := validate_product.Struct(&product); validationErr != nil {
+			c.JSON(http.StatusBadRequest, responses.GetAProduct{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
 			return
 		}
 
-		update := bson.M{"name": absensi.First_name, "location": absensi.Last_name, "title": absensi.Email, "Phone": absensi.Phone, "User_type": absensi.User_type}
+		update := bson.M{"name": product.Name, "Description": product.Description, "Price": product.Price, "Stock": product.Stock, "Size": product.Size, "Image": product.Image}
 		result, err := productAllCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.GetAProduct{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
@@ -114,12 +110,12 @@ func EditProduct() gin.HandlerFunc {
 		if result.MatchedCount == 1 {
 			err := productAllCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&updatedAbsensi)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				c.JSON(http.StatusInternalServerError, responses.GetAProduct{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 				return
 			}
 		}
 
-		c.JSON(http.StatusOK, responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedAbsensi}})
+		c.JSON(http.StatusOK, responses.GetAProduct{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedAbsensi}})
 	}
 }
 
@@ -134,19 +130,19 @@ func DeleteProduct() gin.HandlerFunc {
 		result, err := productAllCollection.DeleteOne(ctx, bson.M{"_id": objId})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.GetAProduct{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
 		if result.DeletedCount < 1 {
 			c.JSON(http.StatusNotFound,
-				responses.GetallUser{Status: http.StatusNotFound, Message: "error", Data: map[string]interface{}{"data": "Absensi with specified ID not found!"}},
+				responses.GetAProduct{Status: http.StatusNotFound, Message: "error", Data: map[string]interface{}{"data": "Absensi with specified ID not found!"}},
 			)
 			return
 		}
 
 		c.JSON(http.StatusOK,
-			responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "Absensi successfully deleted!"}},
+			responses.GetAProduct{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "Absensi successfully deleted!"}},
 		)
 	}
 }
@@ -154,29 +150,29 @@ func DeleteProduct() gin.HandlerFunc {
 func GetAllProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var absensis []models.User
+		var absensis []models.ProductAll
 		defer cancel()
 
 		results, err := productAllCollection.Find(ctx, bson.M{})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.GetAProduct{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
 		//reading from the db in an optimal way
 		defer results.Close(ctx)
 		for results.Next(ctx) {
-			var singleUser models.User
-			if err = results.Decode(&singleUser); err != nil {
-				c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			var ProductUser models.ProductAll
+			if err = results.Decode(&ProductUser); err != nil {
+				c.JSON(http.StatusInternalServerError, responses.GetAProduct{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			}
 
-			absensis = append(absensis, singleUser)
+			absensis = append(absensis, ProductUser)
 		}
 
 		c.JSON(http.StatusOK,
-			responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": absensis}},
+			responses.GetAProduct{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": absensis}},
 		)
 	}
 }
