@@ -166,7 +166,7 @@ func DeleteFaq() gin.HandlerFunc {
 func GetAllFaq() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var absensis []models.User
+		var absensis []models.FaqAll
 		defer cancel()
 
 		results, err := faqAllCollection.Find(ctx, bson.M{})
@@ -179,7 +179,7 @@ func GetAllFaq() gin.HandlerFunc {
 		//reading from the db in an optimal way
 		defer results.Close(ctx)
 		for results.Next(ctx) {
-			var singleUser models.User
+			var singleUser models.FaqAll
 			if err = results.Decode(&singleUser); err != nil {
 				c.JSON(http.StatusInternalServerError, responses.FaqAll{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			}
