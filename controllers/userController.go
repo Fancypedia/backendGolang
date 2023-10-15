@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/whatsauth/watoken"
 	"golang.org/x/crypto/bcrypt"
 
 	helper "golangsidang/helpers"
@@ -108,6 +109,24 @@ func decryptPublicPasetoToken(publicPasetoToken string, publicKey []byte) (strin
 	return payload, nil
 }
 
+func pasetoFix() {
+	privateKey, publicKey := watoken.GenerateKey()
+
+	//generate token for user awangga
+	userid := "raul"
+	tokenstring, err := watoken.Encode(userid, privateKey)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(tokenstring)
+	//decode token to get userid
+	useridstring := watoken.DecodeGetId(publicKey, tokenstring)
+	if useridstring == "" {
+		fmt.Println("expire token")
+	}
+	fmt.Println(useridstring)
+}
+
 // Signup function
 func Signup() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -172,6 +191,21 @@ func Signup() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate public PASETO token"})
 			return
 		}
+		privateKey, publicKey := watoken.GenerateKey()
+
+		//generate token for user awangga
+		userid := "fancypedia"
+		tokenstring, err := watoken.Encode(userid, privateKey)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(tokenstring)
+		//decode token to get userid
+		useridstring := watoken.DecodeGetId(publicKey, tokenstring)
+		if useridstring == "" {
+			fmt.Println("expire token")
+		}
+		fmt.Println(useridstring)
 
 		user.PublicPaseto_token = &publicPasetoToken
 
@@ -207,6 +241,11 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 		defer cancel()
+		// Assuming 'tokenstring' is the generated token
+		c.JSON(http.StatusOK, gin.H{
+			"message": "User registered successfully",
+			"token":   tokenstring, // Include the generated token in the response
+		})
 		c.JSON(http.StatusOK, resultInsertNumber)
 	}
 }
@@ -309,9 +348,28 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update PASETO token"})
 			return
 		}
+		privateKey, publicKey := watoken.GenerateKey()
 
+		//generate token for user awangga
+		userid := "fanypedia"
+		tokenstring, err := watoken.Encode(userid, privateKey)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(tokenstring)
+		//decode token to get userid
+		useridstring := watoken.DecodeGetId(publicKey, tokenstring)
+		if useridstring == "" {
+			fmt.Println("expire token")
+		}
+		fmt.Println(useridstring)
+		c.JSON(http.StatusOK, gin.H{
+			"message": "User registered successfully",
+			"token":   tokenstring,
+			"all":     foundUser,
+			// Include the generated token in the response
+		})
 		// Token updated successfully
-		c.JSON(http.StatusOK, foundUser)
 	}
 }
 
