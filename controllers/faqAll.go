@@ -22,7 +22,7 @@ var validate_faq = validator.New()
 func CreateFaq() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var user models.User
+		var user models.FaqAll
 		defer cancel()
 
 		//validate the request body
@@ -37,18 +37,12 @@ func CreateFaq() gin.HandlerFunc {
 			return
 		}
 
-		newUser := models.User{
-			ID:           primitive.NewObjectID(),
-			First_name:   user.First_name,
-			Last_name:    user.Last_name,
-			Password:     user.Password,
-			Email:        user.Email,
-			Phone:        user.Phone,
-			Token:        user.Token,
-			User_type:    user.User_type,
-			Created_at:   time.Now(),
-			Updated_at:   time.Now(),
-			Paseto_token: user.Paseto_token,
+		newUser := models.FaqAll{
+			ID:         primitive.NewObjectID(),
+			Question:   user.Question,
+			Answer:     user.Answer,
+			Created_at: time.Now(),
+			Is_publish: user.Is_publish,
 		}
 
 		result, err := faqAllCollection.InsertOne(ctx, newUser)
@@ -64,69 +58,87 @@ func CreateFaq() gin.HandlerFunc {
 func GetFaq() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		userId := c.Param("usersGetId")
-		var user models.User
+		userId := c.Param("id")
+		var faq models.FaqAll
 		defer cancel()
 
-		objId, _ := primitive.ObjectIDFromHex(userId)
-
-		err := faqAllCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&user)
+		objID, err := primitive.ObjectIDFromHex(userId)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid FAQ ID",
+			})
 			return
 		}
 
-		c.JSON(http.StatusOK, responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": user}})
+		err = faqAllCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&faq)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "FAQ not found",
+			})
+			return
+		}
+
+		// Check if the FAQ is published (Is_publish is true) and Answer is not empty
+		if faq.Is_publish && faq.Answer != nil && *faq.Answer != "" {
+			c.JSON(http.StatusOK, faq)
+		} else {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "FAQ not found",
+			})
+		}
 	}
 }
 
 func EditFaq() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		absensiId := c.Param("absensiID")
-		var absensi models.User
+		absensiId := c.Param("id")
+		var product models.FaqAll
 		defer cancel()
 
 		objId, _ := primitive.ObjectIDFromHex(absensiId)
 
-		//validate the request body
-		if err := c.BindJSON(&absensi); err != nil {
-			c.JSON(http.StatusBadRequest, responses.GetallUser{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		// Validate the request body
+		if err := c.BindJSON(&product); err != nil {
+			c.JSON(http.StatusBadRequest, responses.FaqAll{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
-		//use the validator library to validate required fields
-		if validationErr := validate_faq.Struct(&absensi); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.GetallUser{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+		// Set Is_publish to true
+		product.Is_publish = true
+
+		// Use the validator library to validate required fields
+		if validationErr := validate_faq.Struct(&product); validationErr != nil {
+			c.JSON(http.StatusBadRequest, responses.FaqAll{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
 			return
 		}
 
-		update := bson.M{"name": absensi.First_name, "location": absensi.Last_name, "title": absensi.Email, "Phone": absensi.Phone, "User_type": absensi.User_type}
+		update := bson.M{"Question": product.Question, "Answer": product.Answer, "Is_publish": product.Is_publish}
 		result, err := faqAllCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.FaqAll{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
-		//get updated user details
-		var updatedAbsensi models.User
+		// Get updated FAQ details
+		var updatedAbsensi models.FaqAll
 		if result.MatchedCount == 1 {
 			err := faqAllCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&updatedAbsensi)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				c.JSON(http.StatusInternalServerError, responses.FaqAll{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 				return
 			}
 		}
 
-		c.JSON(http.StatusOK, responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedAbsensi}})
+		c.JSON(http.StatusOK, responses.FaqAll{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedAbsensi}})
 	}
 }
 
 func DeleteFaq() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		userIDdel := c.Param("usersID")
+		userIDdel := c.Param("id")
 		defer cancel()
 
 		objId, _ := primitive.ObjectIDFromHex(userIDdel)
@@ -134,19 +146,19 @@ func DeleteFaq() gin.HandlerFunc {
 		result, err := faqAllCollection.DeleteOne(ctx, bson.M{"_id": objId})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.FaqAll{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
 		if result.DeletedCount < 1 {
 			c.JSON(http.StatusNotFound,
-				responses.GetallUser{Status: http.StatusNotFound, Message: "error", Data: map[string]interface{}{"data": "Absensi with specified ID not found!"}},
+				responses.FaqAll{Status: http.StatusNotFound, Message: "error", Data: map[string]interface{}{"data": "Absensi with specified ID not found!"}},
 			)
 			return
 		}
 
 		c.JSON(http.StatusOK,
-			responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "Absensi successfully deleted!"}},
+			responses.FaqAll{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "Absensi successfully deleted!"}},
 		)
 	}
 }
@@ -160,7 +172,7 @@ func GetAllFaq() gin.HandlerFunc {
 		results, err := faqAllCollection.Find(ctx, bson.M{})
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.JSON(http.StatusInternalServerError, responses.FaqAll{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
 		}
 
@@ -169,14 +181,14 @@ func GetAllFaq() gin.HandlerFunc {
 		for results.Next(ctx) {
 			var singleUser models.User
 			if err = results.Decode(&singleUser); err != nil {
-				c.JSON(http.StatusInternalServerError, responses.GetallUser{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				c.JSON(http.StatusInternalServerError, responses.FaqAll{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			}
 
 			absensis = append(absensis, singleUser)
 		}
 
 		c.JSON(http.StatusOK,
-			responses.GetallUser{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": absensis}},
+			responses.FaqAll{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": absensis}},
 		)
 	}
 }
