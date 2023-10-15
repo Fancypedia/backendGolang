@@ -26,6 +26,7 @@ func main() {
 	routes.UserRoutes(router)
 	routes.GetAlluser(router)
 	routes.GetAllProduct(router)
+	routes.FaqRoutes(router)
 
 	router.GET("/api-1", func(c *gin.Context) {
 		c.JSON(200, gin.H{
